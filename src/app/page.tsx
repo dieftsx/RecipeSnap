@@ -62,14 +62,14 @@ export default function Home() {
 
   const handleAnalyzeClick = async () => {
     if (!imageDataUri) {
-      toast({ title: 'No image selected', description: 'Please upload an image first.', variant: 'destructive' });
+      toast({ title: 'Nenhuma imagem selecionada', description: 'Por favor, envie uma imagem primeiro.', variant: 'destructive' });
       return;
     }
     setIsLoadingIngredients(true);
     setRecipes(null);
     const result = await invokeAnalyzePhotoForIngredients({ photoDataUri: imageDataUri });
     if (result.error) {
-      toast({ title: 'Analysis Failed', description: result.error, variant: 'destructive' });
+      toast({ title: 'Falha na análise', description: result.error, variant: 'destructive' });
     } else {
       setIngredients(result.ingredients || []);
     }
@@ -95,28 +95,28 @@ export default function Home() {
 
   const handleGetRecipesClick = async () => {
     if (ingredients.length === 0) {
-      toast({ title: 'No Ingredients', description: 'Please add some ingredients to find recipes.', variant: 'destructive' });
+      toast({ title: 'Sem ingredientes', description: 'Por favor, adicione alguns ingredientes para encontrar receitas.', variant: 'destructive' });
       return;
     }
     setIsLoadingRecipes(true);
     setRecipes(null);
     const result = await invokeSuggestRecipesFromIngredients({ ingredients, dietaryRestrictions });
     if (result.error) {
-      toast({ title: 'Recipe Generation Failed', description: result.error, variant: 'destructive' });
+      toast({ title: 'Falha na geração de receitas', description: result.error, variant: 'destructive' });
     } else {
       setRecipes(result.recipes || []);
       if (!result.recipes || result.recipes.length === 0) {
-        toast({ title: 'No Recipes Found', description: 'Try adjusting your ingredients or filters.' });
+        toast({ title: 'Nenhuma receita encontrada', description: 'Tente ajustar seus ingredientes ou filtros.' });
       }
     }
     setIsLoadingRecipes(false);
   };
 
   const dietaryOptions = [
-    { id: 'vegetarian', label: 'Vegetarian', icon: Leaf },
-    { id: 'vegan', label: 'Vegan', icon: Vegan },
-    { id: 'gluten-free', label: 'Gluten-Free', icon: WheatOff },
-    { id: 'dairy-free', label: 'Dairy-Free', icon: MilkOff },
+    { id: 'vegetarian', label: 'Vegetariano', icon: Leaf },
+    { id: 'vegan', label: 'Vegano', icon: Vegan },
+    { id: 'gluten-free', label: 'Sem Glúten', icon: WheatOff },
+    { id: 'dairy-free', label: 'Sem Laticínios', icon: MilkOff },
   ];
 
   return (
@@ -132,9 +132,9 @@ export default function Home() {
             <CardHeader>
               <CardTitle className="font-headline text-2xl flex items-center gap-3">
                 <div className="bg-accent text-accent-foreground rounded-full h-8 w-8 flex items-center justify-center font-bold flex-shrink-0">1</div>
-                Upload a photo of your ingredients
+                Envie uma foto dos seus ingredientes
               </CardTitle>
-              <CardDescription>Let our AI chef see what you're working with.</CardDescription>
+              <CardDescription>Deixe nosso chef de IA ver o que você tem em mãos.</CardDescription>
             </CardHeader>
             <CardContent className="grid md:grid-cols-2 gap-6 items-center">
               <div
@@ -143,19 +143,19 @@ export default function Home() {
               >
                 <input type="file" accept="image/*" ref={fileInputRef} onChange={handleImageChange} className="hidden" />
                 {imagePreview ? (
-                  <Image src={imagePreview} alt="Ingredients preview" fill className="object-cover rounded-lg" />
+                  <Image src={imagePreview} alt="Pré-visualização dos ingredientes" fill className="object-cover rounded-lg" />
                 ) : (
                   <div className="flex flex-col items-center gap-2 text-muted-foreground">
                     <Camera className="h-12 w-12" />
-                    <span>Click to upload image</span>
+                    <span>Clique para enviar uma imagem</span>
                   </div>
                 )}
               </div>
               <div className="flex flex-col gap-4 items-start">
-                <p className="text-muted-foreground">Once you've uploaded an image, we'll analyze it to identify your ingredients.</p>
+                <p className="text-muted-foreground">Depois de enviar uma imagem, vamos analisá-la para identificar seus ingredientes.</p>
                 <Button onClick={handleAnalyzeClick} disabled={!imagePreview || isLoadingIngredients} size="lg">
                   {isLoadingIngredients ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
-                  Analyze Ingredients
+                  Analisar Ingredientes
                 </Button>
               </div>
             </CardContent>
@@ -166,13 +166,13 @@ export default function Home() {
               <CardHeader>
                 <CardTitle className="font-headline text-2xl flex items-center gap-3">
                   <div className="bg-accent text-accent-foreground rounded-full h-8 w-8 flex items-center justify-center font-bold flex-shrink-0">2</div>
-                  Refine ingredients and add filters
+                  Refine os ingredientes e adicione filtros
                 </CardTitle>
-                <CardDescription>Add or remove items and specify any dietary needs.</CardDescription>
+                <CardDescription>Adicione ou remova itens e especifique quaisquer necessidades alimentares.</CardDescription>
               </CardHeader>
               <CardContent className="flex flex-col gap-6">
                 <div>
-                  <h3 className="font-bold mb-2 font-headline">Identified Ingredients</h3>
+                  <h3 className="font-bold mb-2 font-headline">Ingredientes Identificados</h3>
                   {isLoadingIngredients ? (
                     <div className="flex gap-2 flex-wrap">
                       <div className="h-8 w-24 bg-muted animate-pulse rounded-full" />
@@ -189,23 +189,23 @@ export default function Home() {
                           </button>
                         </Badge>
                       ))}
-                      {ingredients.length === 0 && <p className="text-muted-foreground">No ingredients found. Try another photo or add them manually.</p>}
+                      {ingredients.length === 0 && <p className="text-muted-foreground">Nenhum ingrediente encontrado. Tente outra foto ou adicione manualmente.</p>}
                     </div>
                   )}
                 </div>
                 
                 <div className="flex gap-2 items-end">
                   <div className="flex-grow">
-                    <Label htmlFor="new-ingredient">Add ingredient manually</Label>
-                    <Input id="new-ingredient" value={newIngredient} onChange={(e) => setNewIngredient(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleAddIngredient()} placeholder="e.g., tomatoes"/>
+                    <Label htmlFor="new-ingredient">Adicionar ingrediente manualmente</Label>
+                    <Input id="new-ingredient" value={newIngredient} onChange={(e) => setNewIngredient(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleAddIngredient()} placeholder="ex: tomates"/>
                   </div>
-                  <Button onClick={handleAddIngredient} variant="outline" aria-label="Add ingredient">
-                    <Plus className="h-4 w-4 mr-2" /> Add
+                  <Button onClick={handleAddIngredient} variant="outline" aria-label="Adicionar ingrediente">
+                    <Plus className="h-4 w-4 mr-2" /> Adicionar
                   </Button>
                 </div>
                 
                 <div>
-                  <h3 className="font-bold mb-2 font-headline">Dietary Filters</h3>
+                  <h3 className="font-bold mb-2 font-headline">Filtros Alimentares</h3>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     {dietaryOptions.map((opt) => (
                       <div key={opt.id} className="flex items-center space-x-2">
@@ -223,7 +223,7 @@ export default function Home() {
                 
                 <Button onClick={handleGetRecipesClick} disabled={isLoadingRecipes || ingredients.length === 0} size="lg" className="self-start">
                   {isLoadingRecipes ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Search className="mr-2 h-4 w-4" />}
-                  Find Recipes
+                  Encontrar Receitas
                 </Button>
               </CardContent>
             </Card>
@@ -234,9 +234,9 @@ export default function Home() {
               <CardHeader>
                 <CardTitle className="font-headline text-2xl flex items-center gap-3">
                   <div className="bg-accent text-accent-foreground rounded-full h-8 w-8 flex items-center justify-center font-bold flex-shrink-0">3</div>
-                  Bon Appétit!
+                  Bom Apetite!
                 </CardTitle>
-                <CardDescription>Here are some recipe ideas. Click any card to see the full recipe.</CardDescription>
+                <CardDescription>Aqui estão algumas ideias de receitas. Clique em qualquer card para ver a receita completa.</CardDescription>
               </CardHeader>
               <CardContent>
                 {isLoadingRecipes ? (
@@ -257,8 +257,8 @@ export default function Home() {
                 ) : (
                   <div className="text-center py-12 text-muted-foreground">
                     <ChefHat className="h-16 w-16 mx-auto mb-4" />
-                    <p className="text-lg">Couldn't find any recipes.</p>
-                    <p>Try being less specific with your ingredients or filters.</p>
+                    <p className="text-lg">Não foi possível encontrar nenhuma receita.</p>
+                    <p>Tente ser menos específico com seus ingredientes ou filtros.</p>
                   </div>
                 )}
               </CardContent>
@@ -276,7 +276,7 @@ function RecipeCard({ recipe, onSelect }: { recipe: Recipe; onSelect: () => void
   return (
     <Card onClick={onSelect} className="cursor-pointer hover:shadow-xl transition-shadow duration-300 flex flex-col group overflow-hidden">
       <div className="relative aspect-video">
-        <Image src={`https://picsum.photos/seed/${encodeURIComponent(recipe.name)}/400/300`} alt={recipe.name} fill className="object-cover rounded-t-lg transition-transform duration-300 group-hover:scale-105" data-ai-hint="food recipe"/>
+        <Image src={`https://picsum.photos/seed/${encodeURIComponent(recipe.name)}/400/300`} alt={recipe.name} fill className="object-cover rounded-t-lg transition-transform duration-300 group-hover:scale-105" data-ai-hint="receita comida"/>
       </div>
       <CardHeader>
         <CardTitle className="font-headline text-lg">{recipe.name}</CardTitle>
@@ -296,13 +296,13 @@ function RecipeDetailsDialog({ recipe, onOpenChange }: { recipe: Recipe | null; 
           {recipe.source && (
             <DialogDescription className="flex items-center gap-2 pt-2">
               <BookCopy className="h-4 w-4" />
-              Source: {recipe.source}
+              Fonte: {recipe.source}
             </DialogDescription>
           )}
         </DialogHeader>
         <div className="overflow-y-auto pr-6 -mr-6 space-y-6">
             <div>
-              <h3 className="font-bold text-xl mb-2 font-headline">Ingredients</h3>
+              <h3 className="font-bold text-xl mb-2 font-headline">Ingredientes</h3>
               <ul className="list-disc list-inside space-y-1">
                 {recipe.ingredients.map((ing, i) => (
                   <li key={i} className="capitalize">{ing}</li>
@@ -310,7 +310,7 @@ function RecipeDetailsDialog({ recipe, onOpenChange }: { recipe: Recipe | null; 
               </ul>
             </div>
             <div>
-              <h3 className="font-bold text-xl mb-2 font-headline">Instructions</h3>
+              <h3 className="font-bold text-xl mb-2 font-headline">Instruções</h3>
               <div className="space-y-4 text-sm text-foreground/90 whitespace-pre-wrap">
                 {recipe.instructions}
               </div>
