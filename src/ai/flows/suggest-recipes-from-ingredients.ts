@@ -52,10 +52,10 @@ const prompt = ai.definePrompt({
   output: {schema: SuggestRecipesFromIngredientsOutputSchema},
   prompt: `You are a recipe suggestion expert. Given a list of ingredients, you will suggest a list of recipes that can be made with those ingredients.
 
-Ingredients: {{{ingredients}}}
+Ingredients: {{#each ingredients}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}
 
 {{#if dietaryRestrictions}}
-Dietary Restrictions: {{{dietaryRestrictions}}}
+Dietary Restrictions: {{#each dietaryRestrictions}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}
 {{/if}}
 
 Suggest recipes that are most relevant to the given ingredients. Return the recipes in the following JSON format:
