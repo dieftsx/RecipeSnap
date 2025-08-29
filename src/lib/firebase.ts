@@ -10,7 +10,7 @@ const firebaseConfig = {
   apiKey: "AIzaSyCkr46_QjGylKZtJgi2jZNpDwgUlk_fNnk",
   authDomain: "recipe-snap-4n9zq.firebaseapp.com",
   messagingSenderId: "616454823870",
-  measurementId: "G-XXXXXXXXXX"
+  measurementId: ""
 };
 
 // Initialize Firebase
