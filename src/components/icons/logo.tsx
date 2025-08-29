@@ -16,17 +16,20 @@ import {
   DropdownMenuTrigger,
 } from '../ui/dropdown-menu';
 import { Button } from '../ui/button';
+import { useRouter } from 'next/navigation';
 
 export function Logo() {
   const { user } = useAuth();
+  const router = useRouter();
 
   const handleLogout = async () => {
     await signOut(auth);
+    router.push('/');
   };
 
   return (
     <div className="flex items-center justify-between w-full">
-      <Link href="/" className="flex items-center gap-3">
+      <Link href={user ? "/dashboard" : "/"} className="flex items-center gap-3">
         <div className="bg-primary rounded-full p-2 flex-shrink-0">
           <ChefHat className="h-6 w-6 text-primary-foreground" />
         </div>
