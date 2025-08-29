@@ -7,7 +7,6 @@ import { ChefHat, ScanLine, CookingPot } from 'lucide-react';
 import { Logo } from '@/components/icons/logo';
 import Link from 'next/link';
 import Image from 'next/image';
-import Food from '@/food.jpg'
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
@@ -51,7 +50,7 @@ export default function LandingPage() {
             </div>
             <div className="relative aspect-square">
                <Image 
-                src={Food} 
+                src="https://picsum.photos/seed/food-plate/800/800"
                 alt="Prato de comida delicioso" 
                 fill 
                 className="object-cover rounded-2xl shadow-2xl"
