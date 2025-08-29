@@ -18,7 +18,7 @@ export async function invokeAnalyzePhotoForIngredients(
     return { ingredients: output.ingredients };
   } catch (e: any) {
     console.error(e);
-    return { error: e.message || 'An unexpected error occurred while analyzing the image.' };
+    return { error: e.message || 'Ocorreu um erro inesperado ao analisar a imagem.' };
   }
 }
 
@@ -31,6 +31,6 @@ export async function invokeSuggestRecipesFromIngredients(
     return { recipes: sortedRecipes };
   } catch (e: any) {
     console.error(e);
-    return { error: e.message || 'An unexpected error occurred while suggesting recipes.' };
+    return { error: e.message || 'Ocorreu um erro inesperado ao sugerir receitas.' };
   }
 }

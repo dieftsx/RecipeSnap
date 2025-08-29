@@ -1,10 +1,10 @@
 'use server';
 /**
- * @fileOverview Analyzes a photo to identify ingredients.
+ * @fileOverview Analisa uma foto para identificar ingredientes.
  *
- * - analyzePhotoForIngredients - A function that analyzes a photo and identifies ingredients.
- * - AnalyzePhotoForIngredientsInput - The input type for the analyzePhotoForIngredients function.
- * - AnalyzePhotoForIngredientsOutput - The return type for the analyzePhotoForIngredients function.
+ * - analyzePhotoForIngredients - Uma função que analisa uma foto e identifica ingredientes.
+ * - AnalyzePhotoForIngredientsInput - O tipo de entrada para a função analyzePhotoForIngredients.
+ * - AnalyzePhotoForIngredientsOutput - O tipo de retorno para a função analyzePhotoForIngredients.
  */
 
 import {ai} from '@/ai/genkit';
@@ -14,7 +14,7 @@ const AnalyzePhotoForIngredientsInputSchema = z.object({
   photoDataUri: z
     .string()
     .describe(
-      "A photo of ingredients, as a data URI that must include a MIME type and use Base64 encoding. Expected format: 'data:<mimetype>;base64,<encoded_data>'."
+      "Uma foto de ingredientes, como um data URI que deve incluir um tipo MIME e usar codificação Base64. Formato esperado: 'data:<mimetype>;base64,<encoded_data>'."
     ),
 });
 export type AnalyzePhotoForIngredientsInput = z.infer<typeof AnalyzePhotoForIngredientsInputSchema>;
@@ -22,7 +22,7 @@ export type AnalyzePhotoForIngredientsInput = z.infer<typeof AnalyzePhotoForIngr
 const AnalyzePhotoForIngredientsOutputSchema = z.object({
   ingredients: z
     .array(z.string())
-    .describe('A list of ingredients identified in the photo.'),
+    .describe('Uma lista de ingredientes identificados na foto.'),
 });
 export type AnalyzePhotoForIngredientsOutput = z.infer<typeof AnalyzePhotoForIngredientsOutputSchema>;
 
@@ -36,11 +36,11 @@ const analyzePhotoForIngredientsPrompt = ai.definePrompt({
   name: 'analyzePhotoForIngredientsPrompt',
   input: {schema: AnalyzePhotoForIngredientsInputSchema},
   output: {schema: AnalyzePhotoForIngredientsOutputSchema},
-  prompt: `You are an expert chef. Analyze the photo and identify the ingredients.
+  prompt: `Você é um chef especialista. Analise a foto e identifique os ingredientes.
 
-  Photo: {{media url=photoDataUri}}
+  Foto: {{media url=photoDataUri}}
 
-  List the ingredients you identify.`, // Removed unnecessary stock price instruction.
+  Liste os ingredientes que você identificar.`,
 });
 
 const analyzePhotoForIngredientsFlow = ai.defineFlow(

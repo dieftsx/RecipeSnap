@@ -1,10 +1,10 @@
 'use server';
 /**
- * @fileOverview This file defines a Genkit flow for suggesting recipes based on a list of ingredients.
+ * @fileOverview Este arquivo define um fluxo Genkit para sugerir receitas com base em uma lista de ingredientes.
  *
- * - suggestRecipesFromIngredients - A function that takes a list of ingredients and returns a list of recipe suggestions.
- * - SuggestRecipesFromIngredientsInput - The input type for the suggestRecipesFromIngredients function.
- * - SuggestRecipesFromIngredientsOutput - The return type for the suggestRecipesFromIngredients function.
+ * - suggestRecipesFromIngredients - Uma função que recebe uma lista de ingredientes e retorna uma lista de sugestões de receitas.
+ * - SuggestRecipesFromIngredientsInput - O tipo de entrada para a função suggestRecipesFromIngredients.
+ * - SuggestRecipesFromIngredientsOutput - O tipo de retorno para a função suggestRecipesFromIngredients.
  */
 
 import {ai} from '@/ai/genkit';
@@ -13,11 +13,11 @@ import {z} from 'genkit';
 const SuggestRecipesFromIngredientsInputSchema = z.object({
   ingredients: z
     .array(z.string())
-    .describe('A list of ingredients identified from the image.'),
+    .describe('Uma lista de ingredientes identificados a partir da imagem.'),
   dietaryRestrictions: z
     .array(z.string())
     .optional()
-    .describe('A list of dietary restrictions to consider when suggesting recipes.'),
+    .describe('Uma lista de restrições alimentares a serem consideradas ao sugerir receitas.'),
 });
 
 export type SuggestRecipesFromIngredientsInput = z.infer<
@@ -25,15 +25,15 @@ export type SuggestRecipesFromIngredientsInput = z.infer<
 >;
 
 const RecipeSuggestionSchema = z.object({
-  name: z.string().describe('The name of the recipe.'),
-  ingredients: z.array(z.string()).describe('The list of ingredients needed for the recipe.'),
-  instructions: z.string().describe('The cooking instructions for the recipe.'),
-  relevanceScore: z.number().describe('A score indicating the relevance of the recipe to the ingredients.'),
-  source: z.string().optional().describe('The source of the recipe, e.g., a website or cookbook.'),
+  name: z.string().describe('O nome da receita.'),
+  ingredients: z.array(z.string()).describe('A lista de ingredientes necessários para a receita.'),
+  instructions: z.string().describe('As instruções de cozimento para a receita.'),
+  relevanceScore: z.number().describe('Uma pontuação que indica a relevância da receita para os ingredientes.'),
+  source: z.string().optional().describe('A fonte da receita, por exemplo, um site ou livro de receitas.'),
 });
 
 const SuggestRecipesFromIngredientsOutputSchema = z.object({
-  recipes: z.array(RecipeSuggestionSchema).describe('A list of recipe suggestions.'),
+  recipes: z.array(RecipeSuggestionSchema).describe('Uma lista de sugestões de receitas.'),
 });
 
 export type SuggestRecipesFromIngredientsOutput = z.infer<
@@ -50,17 +50,15 @@ const prompt = ai.definePrompt({
   name: 'suggestRecipesFromIngredientsPrompt',
   input: {schema: SuggestRecipesFromIngredientsInputSchema},
   output: {schema: SuggestRecipesFromIngredientsOutputSchema},
-  prompt: `You are a recipe suggestion expert. Given a list of ingredients, you will suggest a list of recipes that can be made with those ingredients.
+  prompt: `Você é um especialista em sugestão de receitas. Dada uma lista de ingredientes, você sugerirá uma lista de receitas que podem ser feitas com esses ingredientes.
 
-Ingredients: {{{ingredients}}}
+Ingredientes: {{#each ingredients}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}
 
 {{#if dietaryRestrictions}}
-Dietary Restrictions: {{{dietaryRestrictions}}}
+Restrições Alimentares: {{#each dietaryRestrictions}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}
 {{/if}}
 
-Suggest recipes that are most relevant to the given ingredients. Return the recipes in the following JSON format:
-
-{{json examples=[{recipes: [{name: 'Recipe Name', ingredients: ['ingredient1', 'ingredient2'], instructions: 'Step-by-step instructions', relevanceScore: 0.9, source: 'Optional source'}]}]}}
+Sugira receitas que sejam mais relevantes para os ingredientes fornecidos. Retorne as receitas no formato JSON.
 `,
 });
 
