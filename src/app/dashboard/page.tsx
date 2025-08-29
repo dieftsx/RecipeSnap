@@ -63,10 +63,6 @@ export default function DashboardPage() {
   }
   
   const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
-    if (!user) {
-      router.push('/login');
-      return;
-    }
     const file = event.target.files?.[0];
     if (file) {
       setIngredients([]);
@@ -82,10 +78,6 @@ export default function DashboardPage() {
   };
 
   const handleAnalyzeClick = async () => {
-    if (!user) {
-      router.push('/login');
-      return;
-    }
     if (!imageDataUri) {
       toast({ title: 'Nenhuma imagem selecionada', description: 'Por favor, envie uma imagem primeiro.', variant: 'destructive' });
       return;
@@ -119,10 +111,6 @@ export default function DashboardPage() {
   };
 
   const handleGetRecipesClick = async () => {
-    if (!user) {
-        router.push('/login');
-        return;
-    }
     if (ingredients.length === 0) {
       toast({ title: 'Sem ingredientes', description: 'Por favor, adicione alguns ingredientes para encontrar receitas.', variant: 'destructive' });
       return;

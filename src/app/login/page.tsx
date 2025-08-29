@@ -10,7 +10,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Chrome } from 'lucide-react';
 import { Logo } from '@/components/icons/logo';
-import Link from 'next/link';
 
 export default function LoginPage() {
   const { user, loading } = useAuth();
