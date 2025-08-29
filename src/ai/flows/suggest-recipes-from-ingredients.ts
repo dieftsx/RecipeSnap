@@ -58,9 +58,7 @@ Ingredientes: {{#each ingredients}}{{this}}{{#unless @last}}, {{/unless}}{{/each
 Restrições Alimentares: {{#each dietaryRestrictions}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}
 {{/if}}
 
-Sugira receitas que sejam mais relevantes para os ingredientes fornecidos. Retorne as receitas no seguinte formato JSON:
-
-{{json (array (object recipes=(array (object name="Nome da Receita" ingredients=(array "ingrediente1" "ingrediente2") instructions="Instruções passo a passo." relevanceScore=0.9 source="Fonte opcional"))))}}
+Sugira receitas que sejam mais relevantes para os ingredientes fornecidos. Retorne as receitas no formato JSON.
 `,
 });
 
