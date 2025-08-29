@@ -60,7 +60,7 @@ Restrições Alimentares: {{#each dietaryRestrictions}}{{this}}{{#unless @last}}
 
 Sugira receitas que sejam mais relevantes para os ingredientes fornecidos. Retorne as receitas no seguinte formato JSON:
 
-{{{json examples=[{recipes: [{name: "Nome da Receita", ingredients: ["ingrediente1", "ingrediente2"], instructions: "Instruções passo a passo.", relevanceScore: 0.9, source: "Fonte opcional"}]}]}}}
+{{json (array (object recipes=(array (object name="Nome da Receita" ingredients=(array "ingrediente1" "ingrediente2") instructions="Instruções passo a passo." relevanceScore=0.9 source="Fonte opcional"))))}}
 `,
 });
 
