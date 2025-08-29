@@ -1,3 +1,3 @@
 import type { SuggestRecipesFromIngredientsOutput } from "@/ai/flows/suggest-recipes-from-ingredients";
 
-export type Recipe = SuggestRecipesFromIngredientsOutput['recipes'][0];
+export type Recipe = SuggestRecipesFromIngredientsOutput['recipes'][0] & { id?: string };
