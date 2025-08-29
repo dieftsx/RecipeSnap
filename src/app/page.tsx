@@ -1,6 +1,7 @@
+
 "use client";
 
-import { useState, useRef, type ChangeEvent } from 'react';
+import { useState, useRef, type ChangeEvent, useEffect } from 'react';
 import Image from 'next/image';
 import {
   Camera,
@@ -15,6 +16,8 @@ import {
   BookCopy,
   WheatOff,
   MilkOff,
+  Heart,
+  Star,
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -29,6 +32,8 @@ import { useToast } from '@/hooks/use-toast';
 import { invokeAnalyzePhotoForIngredients, invokeSuggestRecipesFromIngredients } from '@/lib/actions';
 import type { Recipe } from '@/lib/types';
 import { Logo } from '@/components/icons/logo';
+import { useAuth } from '@/context/AuthContext';
+import { useRouter } from 'next/navigation';
 
 // Main Page Component
 export default function Home() {
@@ -44,8 +49,14 @@ export default function Home() {
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
-
+  const { user, loading } = useAuth();
+  const router = useRouter();
+  
   const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
+    if (!user) {
+      router.push('/login');
+      return;
+    }
     const file = event.target.files?.[0];
     if (file) {
       setIngredients([]);
@@ -61,6 +72,10 @@ export default function Home() {
   };
 
   const handleAnalyzeClick = async () => {
+    if (!user) {
+      router.push('/login');
+      return;
+    }
     if (!imageDataUri) {
       toast({ title: 'Nenhuma imagem selecionada', description: 'Por favor, envie uma imagem primeiro.', variant: 'destructive' });
       return;
@@ -94,6 +109,10 @@ export default function Home() {
   };
 
   const handleGetRecipesClick = async () => {
+    if (!user) {
+        router.push('/login');
+        return;
+    }
     if (ingredients.length === 0) {
       toast({ title: 'Sem ingredientes', description: 'Por favor, adicione alguns ingredientes para encontrar receitas.', variant: 'destructive' });
       return;
@@ -134,12 +153,12 @@ export default function Home() {
                 <div className="bg-accent text-accent-foreground rounded-full h-8 w-8 flex items-center justify-center font-bold flex-shrink-0">1</div>
                 Envie uma foto dos seus ingredientes
               </CardTitle>
-              <CardDescription>Deixe nosso chef de IA ver o que você tem em mãos.</CardDescription>
+              <CardDescription>Deixe nosso chef de IA ver o que você tem em mãos. Faça login para começar.</CardDescription>
             </CardHeader>
             <CardContent className="grid md:grid-cols-2 gap-6 items-center">
               <div
                 className="relative aspect-video w-full bg-muted rounded-lg flex items-center justify-center border-2 border-dashed border-muted-foreground/30 cursor-pointer hover:border-primary transition-colors"
-                onClick={() => fileInputRef.current?.click()}
+                onClick={() => user ? fileInputRef.current?.click() : router.push('/login')}
               >
                 <input type="file" accept="image/*" ref={fileInputRef} onChange={handleImageChange} className="hidden" />
                 {imagePreview ? (
@@ -147,7 +166,7 @@ export default function Home() {
                 ) : (
                   <div className="flex flex-col items-center gap-2 text-muted-foreground">
                     <Camera className="h-12 w-12" />
-                    <span>Clique para enviar uma imagem</span>
+                    <span>{user ? 'Clique para enviar uma imagem' : 'Faça login para enviar'}</span>
                   </div>
                 )}
               </div>
