@@ -50,11 +50,11 @@ export default function LandingPage() {
             </div>
             <div className="relative aspect-square">
                <Image 
-                src="https://picsum.photos/seed/kitchen/600/600" 
+                src="https://picsum.photos/seed/recipe/600/600" 
                 alt="Prato de comida delicioso" 
                 fill 
                 className="object-cover rounded-2xl shadow-2xl"
-                data-ai-hint="comida saudável"
+                data-ai-hint="prato receita"
               />
             </div>
           </div>
