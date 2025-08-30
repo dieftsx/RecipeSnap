@@ -20,6 +20,9 @@ import {
   Star,
   Trash2,
   HeartCrack,
+  Upload,
+  Video,
+  FlipHorizontal,
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -43,6 +46,8 @@ import { Logo } from '@/components/icons/logo';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 
 // Main Page Component
@@ -58,8 +63,12 @@ export default function DashboardPage() {
   const [isLoadingIngredients, setIsLoadingIngredients] = useState(false);
   const [isLoadingRecipes, setIsLoadingRecipes] = useState(false);
   const [isLoadingFavorites, setIsLoadingFavorites] = useState(true);
+  const [inputMode, setInputMode] = useState<'upload' | 'camera'>('upload');
+  const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   const { toast } = useToast();
   const { user, loading } = useAuth();
   const router = useRouter();
@@ -75,6 +84,45 @@ export default function DashboardPage() {
     }
     setIsLoadingFavorites(false);
   }, [user, toast]);
+  
+  const resetState = () => {
+      setImagePreview(null);
+      setImageDataUri(null);
+      setIngredients([]);
+      setRecipes(null);
+  }
+
+  useEffect(() => {
+    if (inputMode === 'camera') {
+      const getCameraPermission = async () => {
+        try {
+          // Stop any existing stream before getting a new one
+          if (videoRef.current && videoRef.current.srcObject) {
+            (videoRef.current.srcObject as MediaStream).getTracks().forEach(track => track.stop());
+          }
+          const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+          setHasCameraPermission(true);
+          if (videoRef.current) {
+            videoRef.current.srcObject = stream;
+          }
+        } catch (error) {
+          console.error('Error accessing camera:', error);
+          setHasCameraPermission(false);
+          toast({
+            variant: 'destructive',
+            title: 'Acesso à câmera negado',
+            description: 'Por favor, habilite a permissão da câmera nas configurações do seu navegador.',
+          });
+        }
+      };
+      getCameraPermission();
+    } else {
+      // Cleanup camera stream when switching away
+      if (videoRef.current && videoRef.current.srcObject) {
+        (videoRef.current.srcObject as MediaStream).getTracks().forEach(track => track.stop());
+      }
+    }
+  }, [inputMode, toast]);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -92,8 +140,7 @@ export default function DashboardPage() {
   const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      setIngredients([]);
-      setRecipes(null);
+      resetState();
 
       const reader = new FileReader();
       reader.onload = (e) => {
@@ -104,9 +151,26 @@ export default function DashboardPage() {
     }
   };
 
+  const handleCapturePhoto = () => {
+    if (videoRef.current && canvasRef.current) {
+      const video = videoRef.current;
+      const canvas = canvasRef.current;
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const context = canvas.getContext('2d');
+      if (context) {
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+        const dataUri = canvas.toDataURL('image/jpeg');
+        resetState();
+        setImageDataUri(dataUri);
+        setImagePreview(dataUri);
+      }
+    }
+  };
+
   const handleAnalyzeClick = async () => {
     if (!imageDataUri) {
-      toast({ title: 'Nenhuma imagem selecionada', description: 'Por favor, envie uma imagem primeiro.', variant: 'destructive' });
+      toast({ title: 'Nenhuma imagem selecionada', description: 'Por favor, envie ou capture uma imagem primeiro.', variant: 'destructive' });
       return;
     }
     setIsLoadingIngredients(true);
@@ -206,27 +270,86 @@ export default function DashboardPage() {
               <CardHeader>
                 <CardTitle className="font-headline text-2xl flex items-center gap-3">
                   <div className="bg-accent text-accent-foreground rounded-full h-8 w-8 flex items-center justify-center font-bold flex-shrink-0">1</div>
-                  Envie uma foto dos seus ingredientes
+                  Envie ou fotografe seus ingredientes
                 </CardTitle>
-                <CardDescription>Deixe nosso chef de IA ver o que você tem em mãos.</CardDescription>
+                 <CardDescription>Deixe nosso chef de IA ver o que você tem em mãos. Use uma foto existente ou a câmera do seu dispositivo.</CardDescription>
               </CardHeader>
               <CardContent className="grid md:grid-cols-2 gap-6 items-center">
-                <div
-                  className="relative aspect-video w-full bg-muted rounded-lg flex items-center justify-center border-2 border-dashed border-muted-foreground/30 cursor-pointer hover:border-primary transition-colors"
-                  onClick={() => fileInputRef.current?.click()}
-                >
-                  <input type="file" accept="image/*" ref={fileInputRef} onChange={handleImageChange} className="hidden" />
-                  {imagePreview ? (
-                    <Image src={imagePreview} alt="Pré-visualização dos ingredientes" fill className="object-cover rounded-lg" />
-                  ) : (
-                    <div className="flex flex-col items-center gap-2 text-muted-foreground">
-                      <Camera className="h-12 w-12" />
-                      <span>Clique para enviar uma imagem</span>
-                    </div>
-                  )}
+                <div className="flex flex-col gap-4">
+                    <ToggleGroup 
+                      type="single" 
+                      defaultValue="upload" 
+                      value={inputMode}
+                      onValueChange={(value: 'upload' | 'camera') => value && setInputMode(value)}
+                      className="w-full"
+                    >
+                      <ToggleGroupItem value="upload" className="w-1/2" aria-label="Upload a photo">
+                        <Upload className="h-4 w-4 mr-2" /> Upload
+                      </ToggleGroupItem>
+                      <ToggleGroupItem value="camera" className="w-1/2" aria-label="Use camera">
+                        <Video className="h-4 w-4 mr-2" /> Câmera
+                      </ToggleGroupItem>
+                    </ToggleGroup>
+                    
+                    {inputMode === 'upload' && (
+                       <div
+                        className="relative aspect-video w-full bg-muted rounded-lg flex items-center justify-center border-2 border-dashed border-muted-foreground/30 cursor-pointer hover:border-primary transition-colors"
+                        onClick={() => fileInputRef.current?.click()}
+                      >
+                        <input type="file" accept="image/*" ref={fileInputRef} onChange={handleImageChange} className="hidden" />
+                        {imagePreview ? (
+                          <Image src={imagePreview} alt="Pré-visualização dos ingredientes" fill className="object-cover rounded-lg" />
+                        ) : (
+                          <div className="flex flex-col items-center gap-2 text-muted-foreground">
+                            <Camera className="h-12 w-12" />
+                            <span>Clique para enviar uma imagem</span>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                    
+                    {inputMode === 'camera' && (
+                      <div className="relative aspect-video w-full bg-muted rounded-lg flex items-center justify-center overflow-hidden">
+                        {hasCameraPermission === false ? (
+                           <Alert variant="destructive" className='w-full mx-4'>
+                            <AlertTitle>Acesso à Câmera Necessário</AlertTitle>
+                            <AlertDescription>
+                              Por favor, permita o acesso à câmera para usar esta função.
+                            </AlertDescription>
+                          </Alert>
+                        ) : imagePreview ? (
+                           <Image src={imagePreview} alt="Captura dos ingredientes" fill className="object-cover rounded-lg" />
+                        ) : (
+                          <video ref={videoRef} className="w-full h-full object-cover" autoPlay muted playsInline />
+                        )}
+                         <canvas ref={canvasRef} className="hidden" />
+                      </div>
+                    )}
                 </div>
+
                 <div className="flex flex-col gap-4 items-start">
-                  <p className="text-muted-foreground">Depois de enviar uma imagem, vamos analisá-la para identificar seus ingredientes.</p>
+                  {inputMode === 'camera' && !imagePreview && (
+                    <>
+                      <p className="text-muted-foreground">Posicione os ingredientes na frente da câmera e clique em capturar.</p>
+                       <Button onClick={handleCapturePhoto} size="lg" disabled={hasCameraPermission === false}>
+                        <Camera className="mr-2 h-4 w-4" />
+                        Capturar Foto
+                      </Button>
+                    </>
+                  )}
+                   {inputMode === 'camera' && imagePreview && (
+                     <>
+                      <p className="text-muted-foreground">Foto capturada! Agora você pode analisar os ingredientes.</p>
+                       <Button onClick={() => setImagePreview(null)} size="lg" variant="outline">
+                        <FlipHorizontal className="mr-2 h-4 w-4" />
+                        Tirar outra foto
+                      </Button>
+                    </>
+                  )}
+                  {inputMode === 'upload' && (
+                     <p className="text-muted-foreground">Depois de enviar uma imagem, vamos analisá-la para identificar seus ingredientes.</p>
+                  )}
+                  
                   <Button onClick={handleAnalyzeClick} disabled={!imagePreview || isLoadingIngredients} size="lg">
                     {isLoadingIngredients ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
                     Analisar Ingredientes
@@ -472,3 +595,6 @@ function RecipeDetailsDialog({ recipe, onOpenChange, isFavorite, onToggleFavorit
     </Dialog>
   );
 }
+
+
+    
