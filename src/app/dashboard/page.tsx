@@ -73,6 +73,40 @@ export default function DashboardPage() {
   const { user, loading } = useAuth();
   const router = useRouter();
 
+  // Load state from sessionStorage on initial render
+  useEffect(() => {
+    try {
+      const persistedState = sessionStorage.getItem('recipeSnapState');
+      if (persistedState) {
+        const state = JSON.parse(persistedState);
+        setImagePreview(state.imagePreview);
+        setImageDataUri(state.imageDataUri);
+        setIngredients(state.ingredients || []);
+        setRecipes(state.recipes);
+        setDietaryRestrictions(state.dietaryRestrictions || []);
+      }
+    } catch (error) {
+      console.error("Failed to parse state from sessionStorage", error);
+      sessionStorage.removeItem('recipeSnapState');
+    }
+  }, []);
+
+  // Save state to sessionStorage whenever it changes
+  useEffect(() => {
+    try {
+      const stateToPersist = {
+        imagePreview,
+        imageDataUri,
+        ingredients,
+        recipes,
+        dietaryRestrictions,
+      };
+      sessionStorage.setItem('recipeSnapState', JSON.stringify(stateToPersist));
+    } catch (error) {
+      console.error("Failed to save state to sessionStorage", error);
+    }
+  }, [imagePreview, imageDataUri, ingredients, recipes, dietaryRestrictions]);
+
   const fetchFavorites = useCallback(async () => {
     if (!user) return;
     setIsLoadingFavorites(true);
@@ -358,7 +392,7 @@ export default function DashboardPage() {
               </CardContent>
             </Card>
 
-            {(ingredients.length > 0 || isLoadingIngredients) && (
+            {(ingredients.length > 0 || isLoadingIngredients || recipes) && (
               <Card className="shadow-lg">
                 <CardHeader>
                   <CardTitle className="font-headline text-2xl flex items-center gap-3">
@@ -406,7 +440,11 @@ export default function DashboardPage() {
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                       {dietaryOptions.map((opt) => (
                         <div key={opt.id} className="flex items-center space-x-2">
-                          <Checkbox id={opt.id} onCheckedChange={(checked) => handleDietaryChange(opt.label, !!checked)} />
+                          <Checkbox 
+                            id={opt.id}
+                            checked={dietaryRestrictions.includes(opt.label)} 
+                            onCheckedChange={(checked) => handleDietaryChange(opt.label, !!checked)} 
+                          />
                           <Label htmlFor={opt.id} className="flex items-center gap-2 cursor-pointer">
                             <opt.icon className="h-5 w-5 text-muted-foreground" />
                             {opt.label}
@@ -595,3 +633,5 @@ function RecipeDetailsDialog({ recipe, onOpenChange, isFavorite, onToggleFavorit
     </Dialog>
   );
 }
+
+    
