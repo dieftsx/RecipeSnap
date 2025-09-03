@@ -27,7 +27,7 @@ export default function LandingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="flex-grow bg-background text-foreground">
       <header className="py-8 px-4 md:px-8">
         <div className="max-w-6xl mx-auto">
           <Logo />
@@ -103,5 +103,3 @@ export default function LandingPage() {
     </div>
   );
 }
-
-    

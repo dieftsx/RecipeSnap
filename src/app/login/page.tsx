@@ -66,7 +66,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-background p-4">
+    <div className="flex flex-grow flex-col items-center justify-center bg-background p-4">
       <div className="absolute top-8 left-8">
         <Logo />
       </div>
@@ -109,5 +109,3 @@ export default function LoginPage() {
     </div>
   );
 }
-
-    

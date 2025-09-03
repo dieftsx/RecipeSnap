@@ -252,7 +252,7 @@ export default function DashboardPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="flex-grow bg-background text-foreground">
       <header className="py-8 px-4 md:px-8">
         <div className="max-w-4xl mx-auto flex justify-between items-center">
           <Logo />
@@ -595,6 +595,3 @@ function RecipeDetailsDialog({ recipe, onOpenChange, isFavorite, onToggleFavorit
     </Dialog>
   );
 }
-
-
-    
